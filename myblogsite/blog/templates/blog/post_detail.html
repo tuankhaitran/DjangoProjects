@@ -1,0 +1,54 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+
+    <h1 class ="posttitle loader">{{ post.title }} </h1>
+    {% if post.published_date %}
+        <div class="date postdate">
+            {{ post.published_date }}
+        </div>
+
+    {% else %}
+        <a class="btn btn-primary" href="{% url 'post_publish' pk=post.pk %}">Publish</a>
+    {% endif %}
+    <p class="postcontent">{{ post.text|safe|linebreaksbr }}</p>
+    {% if user.is_authenticated %}
+        <a class ='btn btn-primary' href ="{% url 'post_edit' pk=post.pk %}">
+            <span class="glyphicon glyphicon-pencil">Edit</span>
+        </a>
+        <a class ='btn btn-primary' href ="{% url 'post_remove' pk=post.pk %}">
+            <span class="glyphicon glyphicon-remove">Remove</span>
+        </a>
+
+    {% endif %}
+
+    <hr>
+    <a class="btn btn-primary btn-comment" href="{% url 'add_comment_to_post' pk=post.pk %}">Add Comment</a>
+        <div class=container>
+            {% for comment in post.comments.all %}
+                <br>
+                {% if user.is_authenticated or comment.approved_comment %}
+                    {{ comment.created_date }}
+                    {% if not comment.approved_comment %}
+                        <a class ='btn btn-primary' href ="{% url 'comment_remove' pk=comment.pk %}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                              </svg>                        
+                            </a>
+                        <a class ='btn btn-primary' href ="{% url 'comment_approve' pk=comment.pk %}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                              </svg>                        
+                            </a>
+                    {% endif %}
+
+                    <p> {{ comment.text|safe|linebreaks }}</p>
+                    <p> Posted by: {{ comment.author }}</p>
+
+                {% endif %}
+                {% empty %}
+                <p> No Comment </p>
+
+            {% endfor %}
+        </div>
+
+    {% endblock %}
